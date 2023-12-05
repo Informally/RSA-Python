@@ -1,0 +1,81 @@
+from typing import Tuple
+from math import gcd
+
+def is_prime(n):
+    """Check if a number is prime."""
+    if n <= 1:
+        return False
+    elif n <= 3:
+        return True
+    elif n % 2 == 0 or n % 3 == 0:
+        return False
+    i = 5
+    while i * i <= n:
+        if n % i == 0 or n % (i + 2) == 0:
+            return False
+        i += 6
+    return True
+
+def input_prime(prompt):
+    """Take user input for a prime number."""
+    while True:
+        try:
+            value = int(input(prompt))
+            if is_prime(value):
+                return value
+            else:
+                print("Please enter a prime number.")
+        except ValueError:
+            print("Please enter a valid integer.")
+
+def extended_euclidean_algorithm(a: int, b: int) -> Tuple[int, int, int]:
+    """Extended Euclidean Algorithm to find modular inverse."""
+    if b == 0:
+        return 1, 0, a
+    x, y, gcd_val = extended_euclidean_algorithm(b, a % b)
+    return y, x - (a // b) * y, gcd_val
+
+def input_prime_exponent(prompt):
+    """Take user input for a prime number (used for the public exponent)."""
+    while True:
+        user_input = input(prompt)
+        if not user_input:
+            return 65537  # Default value if the user presses Enter
+        try:
+            value = int(user_input)
+            if is_prime(value):
+                return value
+            else:
+                print("Please enter a prime number.")
+        except ValueError:
+            print("Please enter a valid integer.")
+
+def rsa_key_generation(p: int, q: int, public_exponent: int = 65537) -> Tuple[int, int, int, int]:
+    """Generate RSA public and private keys."""
+    n = p * q
+    phi = (p - 1) * (q - 1)
+    e = public_exponent
+    x, y, gcd_val = extended_euclidean_algorithm(e, phi)
+    d = x if x >= 0 else x + phi
+    return e, n, d, n
+
+# Input prime numbers and public exponent for key generation
+primeabove = input_prime("Enter a prime number (p): ")
+primebelow = input_prime("Enter another prime number (q): ")
+
+# Keep asking for a prime public exponent until the user provides one
+user_input_e = input_prime_exponent("Enter the public exponent (e), press Enter for default (65537): ")
+
+# Convert user input to integer or use default value
+public_exponent = int(user_input_e)
+
+# Generate RSA keys
+e, n, d, n = rsa_key_generation(primeabove, primebelow, public_exponent)
+
+# Create a dictionary to store RSA keys
+rsa_keys = {
+    "public_key": (e, n),
+    "private_key": (d, n),
+}
+
+print(rsa_keys)
