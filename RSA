@@ -1,8 +1,11 @@
 from typing import Tuple
 from math import gcd
 
+# Functions for RSA key generation and user input
+
+
+# Function to check if the inputted number's are prime. 
 def is_prime(n):
-    """Check if a number is prime."""
     if n <= 1:
         return False
     elif n <= 3:
@@ -16,8 +19,9 @@ def is_prime(n):
         i += 6
     return True
 
+# Function to process the inputted number, check's if the inputted value is a valid integer.
+# Repeatedly asks for a valid number if the inputted number is not a prime number.
 def input_prime(prompt):
-    """Take user input for a prime number."""
     while True:
         try:
             value = int(input(prompt))
@@ -28,15 +32,23 @@ def input_prime(prompt):
         except ValueError:
             print("Please enter a valid integer.")
 
+# Function to find the modular inverse using Extended Euclidean Algorithm.
 def extended_euclidean_algorithm(a: int, b: int) -> Tuple[int, int, int]:
-    """Extended Euclidean Algorithm to find modular inverse."""
     if b == 0:
         return 1, 0, a
     x, y, gcd_val = extended_euclidean_algorithm(b, a % b)
     return y, x - (a // b) * y, gcd_val
 
+# Function to find the next coprime number greater than the start_number.
+def find_next_coprime(start_number: int, phi: int) -> int:
+    if start_number % 2 == 0:
+        start_number += 1  # Ensure start_number is odd
+    while gcd(start_number, phi) != 1:
+        start_number += 2
+    return start_number
+
+# Function to take user input for a prime number (used for the public exponent).
 def input_prime_exponent(prompt):
-    """Take user input for a prime number (used for the public exponent)."""
     while True:
         user_input = input(prompt)
         if not user_input:
@@ -50,21 +62,80 @@ def input_prime_exponent(prompt):
         except ValueError:
             print("Please enter a valid integer.")
 
+# Function to generate RSA public and private keys.
 def rsa_key_generation(p: int, q: int, public_exponent: int = 65537) -> Tuple[int, int, int, int]:
-    """Generate RSA public and private keys."""
     n = p * q
     phi = (p - 1) * (q - 1)
     e = public_exponent
-    x, y, gcd_val = extended_euclidean_algorithm(e, phi)
-    d = x if x >= 0 else x + phi
+    
+    # Ensure e is coprime to phi(n)
+    if extended_euclidean_algorithm(e, phi)[2] != 1:
+        print("Warning: Public exponent (e) is not coprime to (p-1)*(q-1). Finding the closest coprime.\n")
+        e = find_next_coprime(e, phi)
+
+    # Calculate private key (d) using the Extended Euclidean Algorithm
+    d = extended_euclidean_algorithm(e, phi)[0]
+    if d < 0:
+        d += phi  # Ensure d is positive
+
     return e, n, d, n
 
+# Encryption functions
+
+# This function calculates the modular exponentiation using the square-and-multiply method.
+# This function also omputes (a^b) mod n efficiently.
+def mod_exp(a, b, n):
+    a = a % n
+    result = 1
+    x = a
+    while b > 0:
+        least_significant_bit = b % 2
+        b = b // 2
+        if least_significant_bit == 1:
+            result = (result * x) % n
+        x = (x * x) % n
+    return result
+
+# This function encrypts a message using RSA algorithm.
+def encrypt_message(e, n):
+    while True:
+        plaintext_input = input("\nEnter plaintext in numerical value which you would like to encrypt: \n")
+        if plaintext_input:
+            break
+        else:
+            print("Please include a number.")
+    
+    # Convert user input to a list of integers
+    numerical_values = [int(value.strip()) for value in plaintext_input.split(',')]
+
+    # Perform RSA encryption
+    ciphertext = [mod_exp(char, e, n) for char in numerical_values]
+    return ciphertext
+
+# Decryption functions
+
+# This function decrypts a message using RSA algorithm.
+def decrypt_message(d, n):
+    while True:
+        ciphertext_input = input("\nEnter the ciphertext value which you would like to decrypt: \n")
+        if ciphertext_input:
+            break
+        else:
+            print("Please include a number.")
+    
+    # Convert user input to a list of integers
+    numerical_values = [int(value.strip()) for value in ciphertext_input.split(',')]
+
+    # Perform RSA decryption
+    plaintext = [mod_exp(char, d, n) for char in numerical_values]
+    return plaintext
+
 # Input prime numbers and public exponent for key generation
-primeabove = input_prime("Enter a prime number (p): ")
-primebelow = input_prime("Enter another prime number (q): ")
+primeabove = input_prime("Enter a prime number (p): \n")
+primebelow = input_prime("Enter another prime number (q): \n")
 
 # Keep asking for a prime public exponent until the user provides one
-user_input_e = input_prime_exponent("Enter the public exponent (e), press Enter for default (65537): ")
+user_input_e = input_prime_exponent("Enter the public exponent (e), press Enter for default (65537): \n")
 
 # Convert user input to integer or use default value
 public_exponent = int(user_input_e)
@@ -74,8 +145,16 @@ e, n, d, n = rsa_key_generation(primeabove, primebelow, public_exponent)
 
 # Create a dictionary to store RSA keys
 rsa_keys = {
-    "public_key": (e, n),
-    "private_key": (d, n),
+    "Public_Key": (e, n),
+    "Private_Key": (d, n),
 }
 
 print(rsa_keys)
+
+# Encrypt a message using the generated keys
+ciphertext = encrypt_message(e, n)
+print("Ciphertext is:", ciphertext)
+
+# Decrypt a message using the generated keys
+plaintext_decrypted = decrypt_message(d, n)
+print("Plaintext is:", plaintext_decrypted)
