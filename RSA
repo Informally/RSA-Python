@@ -70,7 +70,7 @@ def rsa_key_generation(p: int, q: int, public_exponent: int = 65537) -> Tuple[in
     
     # Ensure e is coprime to phi(n)
     if extended_euclidean_algorithm(e, phi)[2] != 1:
-        print("Warning: Public exponent (e) is not coprime to (p-1)*(q-1). Finding the closest coprime.\n")
+        print("Warning: Public exponent (e) is not coprime to (p-1)*(q-1). Finding the closest coprime.")
         e = find_next_coprime(e, phi)
 
     # Calculate private key (d) using the Extended Euclidean Algorithm
@@ -99,36 +99,26 @@ def mod_exp(a, b, n):
 # This function encrypts a message using RSA algorithm.
 def encrypt_message(e, n):
     while True:
-        plaintext_input = input("\nEnter plaintext in numerical value which you would like to encrypt: \n")
-        if plaintext_input:
-            break
-        else:
-            print("Please include a number.")
-    
-    # Convert user input to a list of integers
-    numerical_values = [int(value.strip()) for value in plaintext_input.split(',')]
-
-    # Perform RSA encryption
-    ciphertext = [mod_exp(char, e, n) for char in numerical_values]
-    return ciphertext
+        try:
+            plaintext_input = input("\nEnter plaintext in numerical value which you would like to encrypt: \n")
+            numerical_values = [int(value.strip()) for value in plaintext_input.split(',')] # Convert user input to a list of integers
+            ciphertext = [mod_exp(char, e, n) for char in numerical_values] # Perform RSA encryption
+            return ciphertext
+        except ValueError:
+            print("Invalid input. Please enter numerical values only.")
 
 # Decryption functions
 
 # This function decrypts a message using RSA algorithm.
 def decrypt_message(d, n):
     while True:
-        ciphertext_input = input("\nEnter the ciphertext value which you would like to decrypt: \n")
-        if ciphertext_input:
-            break
-        else:
-            print("Please include a number.")
-    
-    # Convert user input to a list of integers
-    numerical_values = [int(value.strip()) for value in ciphertext_input.split(',')]
-
-    # Perform RSA decryption
-    plaintext = [mod_exp(char, d, n) for char in numerical_values]
-    return plaintext
+        try:
+            ciphertext_input = input("\nEnter the ciphertext value which you would like to decrypt: \n")
+            numerical_values = [int(value.strip()) for value in ciphertext_input.split(',')] # Convert user input to a list of integers
+            plaintext = [mod_exp(char, d, n) for char in numerical_values] # Perform RSA decryption
+            return plaintext
+        except ValueError:
+            print("Invalid input. Please enter numerical values only.")
 
 # Input prime numbers and public exponent for key generation
 primeabove = input_prime("Enter a prime number (p): \n")
