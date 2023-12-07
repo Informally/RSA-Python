@@ -40,6 +40,9 @@ def extended_euclidean_algorithm(a: int, b: int) -> Tuple[int, int, int]:
     return y, x - (a // b) * y, gcd_val
 
 # Function to find the next coprime number greater than the start_number.
+# The algorithm searches for coprime numbers for the number phi.
+# It starts from searching from the startNumber that is provided (or 3 if its not),
+# and searches for the next coprime number that is greater than the startNumber.
 def find_next_coprime(start_number: int, phi: int) -> int:
     if start_number % 2 == 0:
         start_number += 1  # Ensure start_number is odd
@@ -52,7 +55,8 @@ def input_prime_exponent(prompt):
     while True:
         user_input = input(prompt)
         if not user_input:
-            return 65537  # Default value if the user presses Enter
+            return 65537  # Default value if the user presses Enter. For RSA, a good practice is just to use 65537 as the value 
+                          # of e for compatibility and performance.
         try:
             value = int(user_input)
             if is_prime(value):
