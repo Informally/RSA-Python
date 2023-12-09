@@ -51,7 +51,7 @@ def find_next_coprime(start_number: int, phi: int) -> int:
     return start_number
 
 # Function to take user input for a prime number (used for the public exponent).
-def input_prime_exponent(prompt):
+def input_prime_exponent(prompt, phi):
     while True:
         user_input = input(prompt)
         if not user_input:
@@ -59,10 +59,10 @@ def input_prime_exponent(prompt):
                           # of e for compatibility and performance.
         try:
             value = int(user_input)
-            if is_prime(value):
+            if is_prime(value) and 1 < value < phi and gcd(value, phi) == 1:
                 return value
             else:
-                print("Please enter a prime number.")
+                print(f"Please enter a prime number less than {phi} and coprime to {phi}.")
         except ValueError:
             print("Please enter a valid integer.")
 
@@ -106,8 +106,11 @@ def encrypt_message(e, n):
         try:
             plaintext_input = input("\nEnter plaintext in numerical value which you would like to encrypt: \n")
             numerical_values = [int(value.strip()) for value in plaintext_input.split(',')] # Convert user input to a list of integers
-            ciphertext = [mod_exp(char, e, n) for char in numerical_values] # Perform RSA encryption
-            return ciphertext
+            if max(numerical_values) < n:
+                ciphertext = [mod_exp(char, e, n) for char in numerical_values]
+                return ciphertext
+            else:
+                print(f"Error: Please enter numerical values less than {n}.")
         except ValueError:
             print("Invalid input. Please enter numerical values only.")
 
@@ -119,8 +122,11 @@ def decrypt_message(d, n):
         try:
             ciphertext_input = input("\nEnter the ciphertext value which you would like to decrypt: \n")
             numerical_values = [int(value.strip()) for value in ciphertext_input.split(',')] # Convert user input to a list of integers
-            plaintext = [mod_exp(char, d, n) for char in numerical_values] # Perform RSA decryption
-            return plaintext
+            if max(numerical_values) < n:
+                plaintext = [mod_exp(char, d, n) for char in numerical_values]
+                return plaintext
+            else:
+                print(f"Error: Please enter numerical values less than {n}.")
         except ValueError:
             print("Invalid input. Please enter numerical values only.")
 
@@ -129,7 +135,7 @@ primeabove = input_prime("Enter a prime number (p): \n")
 primebelow = input_prime("Enter another prime number (q): \n")
 
 # Keep asking for a prime public exponent until the user provides one
-user_input_e = input_prime_exponent("Enter the public exponent (e), press Enter for default (65537): \n")
+user_input_e = input_prime_exponent("Enter the public exponent (e), press Enter for default (65537): \n", (primeabove-1)*(primebelow-1))
 
 # Convert user input to integer or use default value
 public_exponent = int(user_input_e)
