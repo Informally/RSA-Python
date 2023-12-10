@@ -3,7 +3,6 @@ from math import gcd
 
 # Functions for RSA key generation and user input
 
-
 # Function to check if the inputted number's are prime. 
 def is_prime(n):
     if n <= 1:
@@ -131,7 +130,7 @@ def decrypt_message(d, n):
             print("Invalid input. Please enter numerical values only.")
 
 # Input prime numbers and public exponent for key generation
-primeabove = input_prime("Enter a prime number (p): \n")
+primeabove = input_prime("Welcome to RSA python program!\n\nEnter a prime number (p): \n")
 primebelow = input_prime("Enter another prime number (q): \n")
 
 # Keep asking for a prime public exponent until the user provides one
