@@ -2,6 +2,7 @@ from typing import Tuple
 from math import gcd
 
 # Functions for RSA key generation and user input
+# Functions for RSA key generation and user input
 
 # Function to check if the inputted number's are prime. 
 def is_prime(n):
@@ -129,31 +130,83 @@ def decrypt_message(d, n):
         except ValueError:
             print("Invalid input. Please enter numerical values only.")
 
-# Input prime numbers and public exponent for key generation
-primeabove = input_prime("Welcome to RSA python program!\n\nEnter a prime number (p): \n")
-primebelow = input_prime("Enter another prime number (q): \n")
+def main():
+    print("Welcome to RSA python program!\n")
+    while True:
+        print("Select an option:\n")
+        print("1. Generate keys and encrypt plaintext")
+        print("2. Generate keys and decrypt ciphertext")
+        print("3. Exit the program\n")
+        
+        try:
+            choice = int(input("Enter your choice (1, 2, or 3): "))
+            if choice == 1:
+                # Generate keys and encrypt plaintext
+                primeabove = input_prime("Enter a prime number (p): \n")
+                primebelow = input_prime("Enter another prime number (q): \n")
 
-# Keep asking for a prime public exponent until the user provides one
-user_input_e = input_prime_exponent("Enter the public exponent (e), press Enter for default (65537): \n", (primeabove-1)*(primebelow-1))
+                # Keep asking for a prime public exponent until the user provides one
+                user_input_e = input_prime_exponent("Enter the public exponent (e), press Enter for default (65537): \n", (primeabove-1)*(primebelow-1))
 
-# Convert user input to integer or use default value
-public_exponent = int(user_input_e)
+                # Convert user input to integer or use default value
+                public_exponent = int(user_input_e)
 
-# Generate RSA keys
-e, n, d, n = rsa_key_generation(primeabove, primebelow, public_exponent)
+                # Generate RSA keys
+                e, n, d, n = rsa_key_generation(primeabove, primebelow, public_exponent)
 
-# Create a dictionary to store RSA keys
-rsa_keys = {
-    "Public_Key": (e, n),
-    "Private_Key": (d, n),
-}
+                # Create a dictionary to store RSA keys
+                rsa_keys = {
+                    "Public_Key": (e, n),
+                    "Private_Key": (d, n),
+                }
 
-print(rsa_keys)
+                print(rsa_keys)
 
-# Encrypt a message using the generated keys
-ciphertext = encrypt_message(e, n)
-print("Ciphertext is:", ciphertext)
+                # Encrypt a message using the generated keys
+                ciphertext = encrypt_message(e, n)
+                print("Ciphertext is:", ciphertext)
 
-# Decrypt a message using the generated keys
-plaintext_decrypted = decrypt_message(d, n)
-print("Plaintext is:", plaintext_decrypted)
+                print("\nExiting program. Goodbye!")
+                break
+
+            elif choice == 2:
+                # Generate keys and decrypt ciphertext
+                primeabove = input_prime("Enter a prime number (p): \n")
+                primebelow = input_prime("Enter another prime number (q): \n")
+
+                # Keep asking for a prime public exponent until the user provides one
+                user_input_e = input_prime_exponent("Enter the public exponent (e), press Enter for default (65537): \n", (primeabove-1)*(primebelow-1))
+
+                # Convert user input to integer or use default value
+                public_exponent = int(user_input_e)
+
+                # Generate RSA keys
+                e, n, d, n = rsa_key_generation(primeabove, primebelow, public_exponent)
+
+                # Create a dictionary to store RSA keys
+                rsa_keys = {
+                    "Public_Key": (e, n),
+                    "Private_Key": (d, n),
+                }
+
+                print(rsa_keys)
+
+                # Decrypt a message using the generated keys
+                plaintext_decrypted = decrypt_message(d, n)
+                print("Plaintext is:", plaintext_decrypted)
+
+                print("\nExiting program. Goodbye!")
+                break
+
+            elif choice == 3:
+                print("\nExiting program. Goodbye!")
+                break
+
+            else:
+                print("Invalid choice. Please enter 1, 2, or 3.")
+
+        except ValueError:
+            print("Invalid input. Please enter a number.")
+
+if __name__ == "__main__":
+    main()
